@@ -94,8 +94,8 @@ func NewServer(be Backend) *Server {
 func (s *Server) SetMinimumCaps(caps []string) {
 	s.caps = caps
 }
-func (s *Server) AddSaslPlain(name string) {
-	s.auths[name] = func(conn *Conn) SaslServer {
+func (s *Server) AddSaslPlain() {
+	s.auths["PLAIN"] = func(conn *Conn) SaslServer {
 		return NewPlainServer(func(identity, username, password string) error {
 			if identity != "" && identity != username {
 				return errors.New("identities not supported")
