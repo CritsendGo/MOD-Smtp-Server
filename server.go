@@ -124,7 +124,7 @@ func (s *Server) AddSaslLogin() {
 	}
 }
 func (s *Server) AddCramMd5Login() {
-	s.auths["CRAMMD5"] = func(conn *Conn) SaslServer {
+	s.auths["CRAM-MD5"] = func(conn *Conn) SaslServer {
 		return NewCramMd5Server(func(username, password string) error {
 
 			sess := conn.Session()

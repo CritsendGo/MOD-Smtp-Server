@@ -14,7 +14,6 @@ type cramMd5Client struct {
 
 func (a *cramMd5Client) Start() (mechanic string, ir []byte, err error) {
 	mechanic = "CRAM-MD5"
-	ir = []byte(a.Username)
 	return
 }
 
