@@ -17,7 +17,7 @@ var (
 	ErrServerClosed = errors.New("smtp: server already closed")
 )
 
-// A function that creates SASL servers.
+// SaslServerFactory A function that creates SASL servers.
 type SaslServerFactory func(conn *Conn) SaslServer
 
 // Logger interface is used by Server to report unexpected internal errors.
@@ -26,7 +26,7 @@ type Logger interface {
 	Println(v ...interface{})
 }
 
-// A SMTP server.
+// Server A SMTP server.
 type Server struct {
 	// TCP or Unix address to listen on.
 	Addr string
@@ -77,7 +77,7 @@ type Server struct {
 	conns     map[*Conn]struct{}
 }
 
-// New creates a new SMTP server.
+// NewServer New creates a new SMTP server.
 func NewServer(be Backend) *Server {
 	return &Server{
 		// Doubled maximum line length per RFC 5321 (Section 4.5.3.1.6)
@@ -98,7 +98,7 @@ func (s *Server) AddSaslPlain(name string) {
 	s.auths[name] = func(conn *Conn) SaslServer {
 		return NewPlainServer(func(identity, username, password string) error {
 			if identity != "" && identity != username {
-				return errors.New("Identities not supported")
+				return errors.New("identities not supported")
 			}
 
 			sess := conn.Session()
@@ -160,8 +160,8 @@ func (s *Server) Serve(l net.Listener) error {
 				} else {
 					tempDelay *= 2
 				}
-				if max := 1 * time.Second; tempDelay > max {
-					tempDelay = max
+				if maxDelay := 1 * time.Second; tempDelay > maxDelay {
+					tempDelay = maxDelay
 				}
 				s.ErrorLog.Printf("accept error: %s; retrying in %s", err, tempDelay)
 				time.Sleep(tempDelay)
@@ -223,12 +223,13 @@ func (s *Server) handleConn(c *Conn) error {
 			if err == io.EOF || errors.Is(err, net.ErrClosed) {
 				return nil
 			}
-			if err == ErrTooLongLine {
+			if errors.Is(err, ErrTooLongLine) {
 				c.writeResponse(500, EnhancedCode{5, 4, 0}, "Too long line, closing connection")
 				return nil
 			}
 
-			if neterr, ok := err.(net.Error); ok && neterr.Timeout() {
+			var nerErr net.Error
+			if errors.As(err, &nerErr) && nerErr.Timeout() {
 				c.writeResponse(421, EnhancedCode{4, 4, 2}, "Idle timeout, bye bye")
 				return nil
 			}
