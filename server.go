@@ -89,7 +89,7 @@ func NewServer(be Backend) *Server {
 		ErrorLog: log.New(os.Stderr, "smtp/server ", log.LstdFlags),
 		caps:     []string{"PIPELINING", "8BITMIME", "ENHANCEDSTATUSCODES", "CHUNKING"},
 		auths: map[string]SaslServerFactory{
-			sasl.Plain: func(conn *Conn) SaslServer {
+			Plain: func(conn *Conn) SaslServer {
 				return sasl.NewPlainServer(func(identity, username, password string) error {
 					if identity != "" && identity != username {
 						return errors.New("Identities not supported")
@@ -103,7 +103,7 @@ func NewServer(be Backend) *Server {
 					return sess.AuthPlain(username, password)
 				})
 			},
-			sasl.Login: func(conn *Conn) SaslServer {
+			Login: func(conn *Conn) SaslServer {
 				return sasl.NewLoginServer(func(username, password string) error {
 
 					sess := conn.Session()

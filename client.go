@@ -15,8 +15,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/emersion/go-sasl"
 )
 
 // A Client represents a client connection to an SMTP server.
@@ -318,7 +316,7 @@ func (c *Client) Verify(addr string) error {
 // Only servers that advertise the AUTH extension support this function.
 //
 // If server returns an error, it will be of type *SMTPError.
-func (c *Client) Auth(a sasl.Client) error {
+func (c *Client) Auth(a SaslClient) error {
 	if err := c.hello(); err != nil {
 		return err
 	}
@@ -573,7 +571,7 @@ var testHookStartTLS func(*tls.Config) // nil, except for tests
 // mechanisms and provide no support for DKIM signing (see go-msgauth), MIME
 // attachments (see the mime/multipart package or the go-message package), or
 // other mail functionality.
-func SendMail(addr string, a sasl.Client, from string, to []string, r io.Reader) error {
+func SendMail(addr string, a SaslClient, from string, to []string, r io.Reader) error {
 	if err := validateLine(from); err != nil {
 		return err
 	}
@@ -609,7 +607,7 @@ func SendMail(addr string, a sasl.Client, from string, to []string, r io.Reader)
 }
 
 // SendMailTLS works like SendMail, but with implicit TLS.
-func SendMailTLS(addr string, a sasl.Client, from string, to []string, r io.Reader) error {
+func SendMailTLS(addr string, a SaslClient, from string, to []string, r io.Reader) error {
 	if err := validateLine(from); err != nil {
 		return err
 	}
