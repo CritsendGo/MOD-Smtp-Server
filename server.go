@@ -4,14 +4,13 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
+	"github.com/emersion/go-sasl"
 	"io"
 	"log"
 	"net"
 	"os"
 	"sync"
 	"time"
-
-	"github.com/emersion/go-sasl"
 )
 
 var (
@@ -20,7 +19,7 @@ var (
 )
 
 // A function that creates SASL servers.
-type SaslServerFactory func(conn *Conn) sasl.Server
+type SaslServerFactory func(conn *Conn) SaslServer
 
 // Logger interface is used by Server to report unexpected internal errors.
 type Logger interface {
@@ -90,7 +89,7 @@ func NewServer(be Backend) *Server {
 		ErrorLog: log.New(os.Stderr, "smtp/server ", log.LstdFlags),
 		caps:     []string{"PIPELINING", "8BITMIME", "ENHANCEDSTATUSCODES", "CHUNKING"},
 		auths: map[string]SaslServerFactory{
-			sasl.Plain: func(conn *Conn) sasl.Server {
+			sasl.Plain: func(conn *Conn) SaslServer {
 				return sasl.NewPlainServer(func(identity, username, password string) error {
 					if identity != "" && identity != username {
 						return errors.New("Identities not supported")
@@ -104,8 +103,8 @@ func NewServer(be Backend) *Server {
 					return sess.AuthPlain(username, password)
 				})
 			},
-			sasl.Login:func(conn *Conn) sasl.Server {
-				return sasl.NewLoginServer(func( username, password string) error {
+			sasl.Login: func(conn *Conn) SaslServer {
+				return sasl.NewLoginServer(func(username, password string) error {
 
 					sess := conn.Session()
 					if sess == nil {
@@ -118,9 +117,10 @@ func NewServer(be Backend) *Server {
 		conns: make(map[*Conn]struct{}),
 	}
 }
-func (s*Server) SetMinimumCaps(caps []string){
-	s.caps=caps
+func (s *Server) SetMinimumCaps(caps []string) {
+	s.caps = caps
 }
+
 // Serve accepts incoming connections on the Listener l.
 func (s *Server) Serve(l net.Listener) error {
 	s.locker.Lock()
