@@ -5,7 +5,7 @@ import (
 )
 
 // CramMd5 The LOGIN mechanism name.
-const CramMd5 = "CRAMMD5"
+const CramMd5 = "CRAM-MD5"
 
 type cramMd5Client struct {
 	Username string
@@ -13,7 +13,7 @@ type cramMd5Client struct {
 }
 
 func (a *cramMd5Client) Start() (mechanic string, ir []byte, err error) {
-	mechanic = "CRAMMD5"
+	mechanic = "CRAM-MD5"
 	ir = []byte(a.Username)
 	return
 }
