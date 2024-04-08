@@ -5,22 +5,20 @@ import (
 )
 
 // The LOGIN mechanism name.
-const Login = "LOGIN"
+const Crammd5 = "CRAMMD5"
 
-var expectedChallenge = []byte("Password:")
-
-type loginClient struct {
+type crmamd5Client struct {
 	Username string
 	Password string
 }
 
-func (a *loginClient) Start() (mech string, ir []byte, err error) {
+func (a *crmamd5Client) Start() (mech string, ir []byte, err error) {
 	mech = "LOGIN"
 	ir = []byte(a.Username)
 	return
 }
 
-func (a *loginClient) Next(challenge []byte) (response []byte, err error) {
+func (a *crmamd5Client) Next(challenge []byte) (response []byte, err error) {
 	if bytes.Compare(challenge, expectedChallenge) != 0 {
 		return nil, ErrUnexpectedServerChallenge
 	} else {
@@ -33,22 +31,22 @@ func (a *loginClient) Next(challenge []byte) (response []byte, err error) {
 //
 // It is considered obsolete, and should not be used when other mechanisms are
 // available. For plaintext password authentication use PLAIN mechanism.
-func NewLoginClient(username, password string) SaslClient {
+func NewCramMd5Client(username, password string) SaslClient {
 	return &loginClient{username, password}
 }
 
 // Authenticates users with an username and a password.
-type LoginAuthenticator func(username, password string) error
+type CramMd5Authenticator func(username, password string) error
 
-type loginState int
+type crammd5State int
 
 const (
-	loginNotStarted loginState = iota
-	loginWaitingUsername
-	loginWaitingPassword
+	crammd5NotStarted loginState = iota
+	crammd5WaitingUsername
+	crammd5WaitingPassword
 )
 
-type loginServer struct {
+type crmamd5Server struct {
 	state              loginState
 	username, password string
 	authenticate       LoginAuthenticator
@@ -59,13 +57,13 @@ type loginServer struct {
 //
 // LOGIN is obsolete and should only be enabled for legacy clients that cannot
 // be updated to use PLAIN.
-func NewLoginServer(authenticator func(username string, password string) error) SaslServer {
-	return &loginServer{authenticate: authenticator}
+func NewCrammd5Server(authenticator func(username string, password string) error) SaslServer {
+	return &crmamd5Server{authenticate: authenticator}
 }
 
-func (a *loginServer) Next(response []byte) (challenge []byte, done bool, err error) {
+func (a *crmamd5Server) Next(response []byte) (challenge []byte, done bool, err error) {
 	switch a.state {
-	case loginNotStarted:
+	case crammd5NotStarted:
 		// Check for initial response field, as per RFC4422 section 3
 		if response == nil {
 			challenge = []byte("Username:")
@@ -73,10 +71,10 @@ func (a *loginServer) Next(response []byte) (challenge []byte, done bool, err er
 		}
 		a.state++
 		fallthrough
-	case loginWaitingUsername:
+	case crammd5WaitingUsername:
 		a.username = string(response)
 		challenge = []byte("Password:")
-	case loginWaitingPassword:
+	case crammd5WaitingPassword:
 		a.password = string(response)
 		err = a.authenticate(a.username, a.password)
 		done = true

@@ -112,10 +112,20 @@ func (s *Server) AddSaslPlain(name string) {
 }
 func (s *Server) AddSaslLogin() {
 	s.auths["LOGIN"] = func(conn *Conn) SaslServer {
-		return NewLoginServer(func(identity, username, password string) error {
-			if identity != "" && identity != username {
-				return errors.New("Identities not supported")
+		return NewLoginServer(func(username, password string) error {
+
+			sess := conn.Session()
+			if sess == nil {
+				panic("No session when AUTH is called")
 			}
+
+			return sess.AuthLogin(username, password)
+		})
+	}
+}
+func (s *Server) AddCramMd5Login() {
+	s.auths["CRAMMD5"] = func(conn *Conn) SaslServer {
+		return NewCrammd5Server(func(username, password string) error {
 
 			sess := conn.Session()
 			if sess == nil {
