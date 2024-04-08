@@ -64,7 +64,7 @@ func (a *cramMd5Server) Next(response []byte) (challenge []byte, done bool, err 
 		if response == nil {
 			// Todo send a hash for encrypt / decrypt into a.key
 			a.key = "sss"
-			challenge = []byte("Username:")
+			challenge = []byte("PDM4MTgwMTk2My4xNzEyNTkyNTMwQE5vbmU+")
 			break
 		}
 		a.state++
