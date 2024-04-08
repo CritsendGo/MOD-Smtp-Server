@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
-	"github.com/emersion/go-sasl"
 	"io"
 	"log"
 	"net"
@@ -90,7 +89,7 @@ func NewServer(be Backend) *Server {
 		caps:     []string{"PIPELINING", "8BITMIME", "ENHANCEDSTATUSCODES", "CHUNKING"},
 		auths: map[string]SaslServerFactory{
 			Plain: func(conn *Conn) SaslServer {
-				return sasl.NewPlainServer(func(identity, username, password string) error {
+				return NewPlainServer(func(identity, username, password string) error {
 					if identity != "" && identity != username {
 						return errors.New("Identities not supported")
 					}
@@ -104,7 +103,7 @@ func NewServer(be Backend) *Server {
 				})
 			},
 			Login: func(conn *Conn) SaslServer {
-				return sasl.NewLoginServer(func(username, password string) error {
+				return NewLoginServer(func(username, password string) error {
 
 					sess := conn.Session()
 					if sess == nil {
