@@ -7,7 +7,7 @@ var (
 )
 
 func ResponseNoEhlo() (int, EnhancedCode, string) {
-	return 502, EnhancedCode{5, 5, 1}, "Please introduce yourself first."
+	return 502, EnhancedCode{5, 5, 1}, "Sorry but who are you before"
 }
 func ResponseBadPipe() (int, EnhancedCode, string) {
 	return 502, EnhancedCode{5, 5, 1}, "MAIL not allowed during message transfer"
