@@ -1,5 +1,4 @@
 module github.com/CritsendGo/MOD-Smtp-Server
 
-require github.com/emersion/go-sasl v0.0.0-20200509203442-7bfe0ed36a21
 
 go 1.21
