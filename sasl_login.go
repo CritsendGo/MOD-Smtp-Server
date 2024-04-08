@@ -59,7 +59,7 @@ type loginServer struct {
 //
 // LOGIN is obsolete and should only be enabled for legacy clients that cannot
 // be updated to use PLAIN.
-func NewLoginServer(authenticator LoginAuthenticator) SaslServer {
+func NewLoginServer(authenticator func(identity string, username string, password string) error) SaslServer {
 	return &loginServer{authenticate: authenticator}
 }
 

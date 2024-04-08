@@ -222,7 +222,6 @@ func (c *Conn) protocolError(code int, ec EnhancedCode, msg string) {
 
 // GREET state -> waiting for HELO
 func (c *Conn) handleGreet(enhanced bool, arg string) {
-	c.conn.RemoteAddr()
 	domain, err := parseHelloArgument(arg)
 	if err != nil {
 		c.writeResponse(501, EnhancedCode{5, 5, 2}, "Domain/address argument required for HELO")
@@ -242,7 +241,7 @@ func (c *Conn) handleGreet(enhanced bool, arg string) {
 	c.setSession(sess)
 
 	if !enhanced {
-		c.writeResponse(250, EnhancedCode{2, 0, 0}, fmt.Sprintf("Hello %s", domain))
+		c.writeResponse(ResponseWelcome(domain))
 		return
 	}
 
@@ -282,11 +281,11 @@ func (c *Conn) handleGreet(enhanced bool, arg string) {
 // READY state -> waiting for MAIL
 func (c *Conn) handleMail(arg string) {
 	if c.helo == "" {
-		c.writeResponse(502, EnhancedCode{5, 5, 1}, "Please introduce yourself first.")
+		c.writeResponse(ResponseNoEhlo())
 		return
 	}
 	if c.bdatPipe != nil {
-		c.writeResponse(502, EnhancedCode{5, 5, 1}, "MAIL not allowed during message transfer")
+		c.writeResponse(ResponseBadPipe())
 		return
 	}
 

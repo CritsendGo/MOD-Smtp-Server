@@ -87,37 +87,44 @@ func NewServer(be Backend) *Server {
 		done:     make(chan struct{}, 1),
 		ErrorLog: log.New(os.Stderr, "smtp/server ", log.LstdFlags),
 		caps:     []string{"PIPELINING", "8BITMIME", "ENHANCEDSTATUSCODES", "CHUNKING"},
-		auths: map[string]SaslServerFactory{
-			Plain: func(conn *Conn) SaslServer {
-				return NewPlainServer(func(identity, username, password string) error {
-					if identity != "" && identity != username {
-						return errors.New("Identities not supported")
-					}
-
-					sess := conn.Session()
-					if sess == nil {
-						panic("No session when AUTH is called")
-					}
-
-					return sess.AuthPlain(username, password)
-				})
-			},
-			Login: func(conn *Conn) SaslServer {
-				return NewLoginServer(func(username, password string) error {
-
-					sess := conn.Session()
-					if sess == nil {
-						panic("No session when AUTH is called")
-					}
-					return sess.AuthLogin(username, password)
-				})
-			},
-		},
-		conns: make(map[*Conn]struct{}),
+		auths:    map[string]SaslServerFactory{},
+		conns:    make(map[*Conn]struct{}),
 	}
 }
 func (s *Server) SetMinimumCaps(caps []string) {
 	s.caps = caps
+}
+func (s *Server) AddSaslPlain(name string) {
+	s.auths[name] = func(conn *Conn) SaslServer {
+		return NewPlainServer(func(identity, username, password string) error {
+			if identity != "" && identity != username {
+				return errors.New("Identities not supported")
+			}
+
+			sess := conn.Session()
+			if sess == nil {
+				panic("No session when AUTH is called")
+			}
+
+			return sess.AuthPlain(username, password)
+		})
+	}
+}
+func (s *Server) AddSaslLogin() {
+	s.auths["LOGIN"] = func(conn *Conn) SaslServer {
+		return NewLoginServer(func(identity, username, password string) error {
+			if identity != "" && identity != username {
+				return errors.New("Identities not supported")
+			}
+
+			sess := conn.Session()
+			if sess == nil {
+				panic("No session when AUTH is called")
+			}
+
+			return sess.AuthLogin(username, password)
+		})
+	}
 }
 
 // Serve accepts incoming connections on the Listener l.
