@@ -78,7 +78,10 @@ type Session interface {
 	AuthPlain(username, password string) error
 	// Authenticate the user using SASL LOGIN.
 	AuthLogin(username, password string) error
-
+	// Authenticate the user using SASL LOGIN.
+	AuthCramMd5(username, password string) error
+	// Authenticate the user using SASL LOGIN.
+	AuthToken(token string) error
 	// Set return path for currently processed message.
 	Mail(from string, opts *MailOptions) error
 	// Add recipient for currently processed message.

@@ -132,7 +132,20 @@ func (s *Server) AddCramMd5Login() {
 				panic("No session when AUTH is called")
 			}
 
-			return sess.AuthLogin(username, password)
+			return sess.AuthCramMd5(username, password)
+		})
+	}
+}
+func (s *Server) AddTokenLogin() {
+	s.auths["TOKEN"] = func(conn *Conn) SaslServer {
+		return NewCramMd5Server(func(username, password string) error {
+
+			sess := conn.Session()
+			if sess == nil {
+				panic("No session when AUTH is called")
+			}
+
+			return sess.AuthToken(username)
 		})
 	}
 }
