@@ -102,7 +102,11 @@ func (c *Conn) handle(cmd string, arg string) {
 		c.protocolError(500, EnhancedCode{5, 5, 2}, "Error: bad syntax")
 		return
 	}
-
+	if c.session.CanContinue() != nil {
+		c.writeResponse(500, EnhancedCode{5, 5, 1}, "Can't continue, Quiting now")
+		c.Close()
+		return
+	}
 	cmd = strings.ToUpper(cmd)
 	switch cmd {
 	case "SEND", "SOML", "SAML", "EXPN", "HELP", "TURN":

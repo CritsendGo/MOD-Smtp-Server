@@ -70,10 +70,8 @@ type MailOptions struct {
 type Session interface {
 	// Discard currently processed message.
 	Reset()
-
 	// Free all resources associated with session.
 	Logout() error
-
 	// Authenticate the user using SASL PLAIN.
 	AuthPlain(username, password string) error
 	// Authenticate the user using SASL LOGIN.
@@ -90,6 +88,8 @@ type Session interface {
 	//
 	// r must be consumed before Data returns.
 	Data(r io.Reader) error
+	// Var
+	CanContinue() error
 }
 
 // LMTPSession is an add-on interface for Session. It can be implemented by
