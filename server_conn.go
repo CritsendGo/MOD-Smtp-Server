@@ -643,6 +643,9 @@ func (c *Conn) handleData(arg string) {
 
 	r := newDataReader(c)
 	code, enhancedCode, msg := toSMTPStatus(c.Session().Data(r))
+	if code == 250 {
+		msg = "Queued with id " + c.session.Verp()
+	}
 	r.limited = false
 	io.Copy(ioutil.Discard, r) // Make sure all the data has been consumed
 	c.writeResponse(code, enhancedCode, msg)
@@ -921,7 +924,7 @@ func toSMTPStatus(err error) (code int, enchCode EnhancedCode, msg string) {
 		}
 	}
 
-	return 250, EnhancedCode{2, 0, 0}, "OK: queued"
+	return 250, EnhancedCode{2, 0, 0}, "OK: queued with id"
 }
 
 func (c *Conn) Reject() {

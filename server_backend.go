@@ -90,6 +90,7 @@ type Session interface {
 	Data(r io.Reader) error
 	// Var
 	CanContinue() error
+	Verp() string
 }
 
 // LMTPSession is an add-on interface for Session. It can be implemented by
