@@ -93,8 +93,8 @@ func (c *Conn) handle(cmd string, arg string) {
 			c.writeResponse(421, EnhancedCode{4, 0, 0}, "Internal server error")
 			c.Close()
 
-			stack := debug.Stack()
-			c.server.ErrorLog.Printf("panic serving %v: %v\n%s", c.conn.RemoteAddr(), err, stack)
+			//stack := debug.Stack()
+			c.server.ErrorLog.Printf("panic serving %v: %v\n%s", c.conn.RemoteAddr(), err, "")
 		}
 	}()
 
