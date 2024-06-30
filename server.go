@@ -145,7 +145,7 @@ func (s *Server) AddTokenLogin() {
 				panic("No session when AUTH is called")
 			}
 
-			return sess.AuthToken(username)
+			return sess.AuthToken(chain)
 		})
 	}
 }
