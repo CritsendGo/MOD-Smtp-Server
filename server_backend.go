@@ -77,7 +77,7 @@ type Session interface {
 	// Authenticate the user using SASL LOGIN.
 	AuthLogin(username, password string) error
 	// Authenticate the user using SASL LOGIN.
-	AuthCramMd5(username, password string) error
+	AuthCramMd5(chain string) error
 	// Authenticate the user using SASL LOGIN.
 	AuthToken(token string) error
 	// Set return path for currently processed message.
