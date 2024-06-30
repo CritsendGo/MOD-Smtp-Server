@@ -125,20 +125,20 @@ func (s *Server) AddSaslLogin() {
 }
 func (s *Server) AddCramMd5Login() {
 	s.auths["CRAM-MD5"] = func(conn *Conn) SaslServer {
-		return NewCramMd5Server(func(username, password string) error {
+		return NewCramMd5Server(func(chain string) error {
 
 			sess := conn.Session()
 			if sess == nil {
 				panic("No session when AUTH is called")
 			}
 
-			return sess.AuthCramMd5(username, password)
+			return sess.AuthCramMd5(chain)
 		})
 	}
 }
 func (s *Server) AddTokenLogin() {
 	s.auths["TOKEN"] = func(conn *Conn) SaslServer {
-		return NewCramMd5Server(func(username, password string) error {
+		return NewCramMd5Server(func(chain string) error {
 
 			sess := conn.Session()
 			if sess == nil {
