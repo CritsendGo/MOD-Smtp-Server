@@ -11,6 +11,7 @@ const CramMd5 = "CRAM-MD5"
 type cramMd5Client struct {
 	Username string
 	Password string
+
 }
 
 func (a *cramMd5Client) Start() (mechanic string, ir []byte, err error) {
@@ -31,7 +32,7 @@ func NewCramMd5Client(username, password string) SaslClient {
 }
 
 // CramMd5Authenticator Authenticates users with an username and a password.
-type CramMd5Authenticator func(username, password string) error
+type CramMd5Authenticator func(chain string) error
 
 type crammd5State int
 
@@ -53,7 +54,7 @@ type cramMd5Server struct {
 //
 // LOGIN is obsolete and should only be enabled for legacy clients that cannot
 // be updated to use PLAIN.
-func NewCramMd5Server(authenticator func(username string, password string) error) SaslServer {
+func NewCramMd5Server(authenticator func(chain string) error) SaslServer {
 	return &cramMd5Server{authenticate: authenticator}
 }
 
@@ -71,9 +72,9 @@ func (a *cramMd5Server) Next(response []byte) (challenge []byte, done bool, err 
 		fallthrough
 	case cramMd5WaitingChain:
 		a.chain = string(response)
-		fmt.Println(response)
+		fmt.Println(string(response))
 		// Todo decode chain with key to retrieve username and password
-		err = a.authenticate(a.username, a.password)
+		err = a.authenticate(a.chain)
 		done = true
 	default:
 		err = ErrUnexpectedClientResponse
