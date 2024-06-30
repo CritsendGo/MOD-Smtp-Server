@@ -2,6 +2,7 @@ package smtp
 
 import (
 	"bytes"
+	"fmt"
 )
 
 // CramMd5 The LOGIN mechanism name.
@@ -70,6 +71,7 @@ func (a *cramMd5Server) Next(response []byte) (challenge []byte, done bool, err 
 		fallthrough
 	case cramMd5WaitingChain:
 		a.chain = string(response)
+		fmt.Println(response)
 		// Todo decode chain with key to retrieve username and password
 		err = a.authenticate(a.username, a.password)
 		done = true
