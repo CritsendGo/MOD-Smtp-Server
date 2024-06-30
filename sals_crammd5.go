@@ -66,11 +66,13 @@ func (a *cramMd5Server) Next(response []byte) (challenge []byte, done bool, err 
 			// Todo send a hash for encrypt / decrypt into a.key
 			a.key = "sss"
 			challenge = []byte("PDM4MTgwMTk2My4xNzEyNTkyNTMwQE5vbmU+")
+			fmt.Println("SEND MD5 CHALLENGE : PDM4MTgwMTk2My4xNzEyNTkyNTMwQE5vbmU+")
 			break
 		}
 		a.state++
 		fallthrough
 	case cramMd5WaitingChain:
+		fmt.Println("RECEIVE : ",string(response))
 		a.chain = string(response)
 		fmt.Println(string(response))
 		// Todo decode chain with key to retrieve username and password
